@@ -7,14 +7,13 @@ import { apiCall } from './apiUtil';
  * redux-thunk apiCall example
  */
 export const changeThunkKiwi = () => async (dispatch, getState) => {
+    dispatch({ type: 'CHANGE_THUNK' })
     try {
         const kiwi = await apiCall();
-        dispatch({
-            type: 'CHANGE_KIWI',
-            display: kiwi.login
-        });
+        dispatch({ type: 'CHANGE_KIWI', display: kiwi.login });
     } catch (error) {
         console.log(error);
+        dispatch({ type: 'ERROR', message: error.message })
     }
 };
 
@@ -24,9 +23,10 @@ export const changeThunkKiwi = () => async (dispatch, getState) => {
 export function* getKiwi() {
     try {
         const kiwi = yield apiCall()
-        yield put({type: 'CHANGE_KIWI', display: kiwi.login});
+        yield put({ type: 'CHANGE_KIWI', display: kiwi.login });
     } catch (error) {
         console.log(error)
+        yield put({ type: 'ERROR', message: error.message });
     }
 }
 
@@ -43,7 +43,7 @@ const changeKiwiEpic = action$ => action$.pipe(
         const kiwi = await apiCall();
         return { type: 'CHANGE_KIWI', display: kiwi.login};
     }),
-    catchError(err => Promise.resolve({type: 'ERROR', message: err.message}))
+    catchError(err => Promise.resolve({ type: 'ERROR', message: err.message }))
 )
 
 export const rootEpic = combineEpics(changeKiwiEpic);
